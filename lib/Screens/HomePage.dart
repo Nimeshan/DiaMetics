@@ -150,7 +150,7 @@ class HomePage extends StatelessWidget {
                 "You have Eaten",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 15),
               Card(
                 color: Color(0xFFFBECEC), // Background color for the card
                 elevation: 4, // Adds shadow to the card
@@ -167,7 +167,7 @@ class HomePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(
                             8), // Rounded corners for the image
                         child: Image.asset(
-                          "assets/profile.png", // Replace with your image path
+                          "assets/food.jpg",
                           width: 50, // Image width
                           height: 50, // Image height
                           fit: BoxFit.cover, // Ensures the image fits nicely
@@ -210,7 +210,7 @@ class HomePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(
                             8), // Rounded corners for the image
                         child: Image.asset(
-                          "assets/profile.png", // Replace with your image path
+                          "assets/food.jpg",
                           width: 50, // Image width
                           height: 50, // Image height
                           fit: BoxFit.cover, // Ensures the image fits nicely
@@ -253,7 +253,7 @@ class HomePage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(
                             8), // Rounded corners for the image
                         child: Image.asset(
-                          "assets/profile.png", // Replace with your image path
+                          "assets/food.jpg",
                           width: 50, // Image width
                           height: 50, // Image height
                           fit: BoxFit.cover, // Ensures the image fits nicely

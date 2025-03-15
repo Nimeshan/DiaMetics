@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   percent_indicator: ^4.2.2
   fl_chart: ^0.70.1
+  youtube_player_flutter: ^9.1.1
 
 dev_dependencies:
   flutter_test:
@@ -23,6 +24,10 @@ flutter:
     - assets/DiaMetics.png
     - assets/GIcon.png
     - assets/profile.png
+    - assets/yoga.png
+    - assets/lifiting.png
+    - assets/running.png
+    - assets/food.jpg
   fonts:
     - family: Montserrat
       fonts:

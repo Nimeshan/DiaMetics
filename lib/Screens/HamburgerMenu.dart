@@ -1,3 +1,7 @@
+import 'package:diametics/Screens/DiabeticLevel.dart';
+import 'package:diametics/Screens/SugarIntake.dart';
+import 'package:diametics/Screens/HomePage.dart';
+import 'package:diametics/Screens/Exercise.dart';
 import 'package:flutter/material.dart';
 
 class HamburgerMenu extends StatelessWidget {
@@ -43,17 +47,28 @@ class HamburgerMenu extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.bar_chart),
             title: const Text('Diabetic Level'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const DiabeticLevel()));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.cake),
             title: const Text('Sugar Intake'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const SugarIntake()));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.fitness_center),
             title: const Text('Exercise'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Exercises()));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.restaurant_menu),
@@ -71,19 +86,6 @@ class HamburgerMenu extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: const Center(child: Text('Welcome to the Home Page!')),
-    );
-  }
-}
-
 void main() {
   runApp(const MaterialApp(home: Scaffold(drawer: HamburgerMenu())));
 }
-                                                                                  
