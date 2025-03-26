@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "862563017151",
+    "project_id": "diametics-90bd8",
+    "storage_bucket": "diametics-90bd8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862563017151:android:cc13d349f94434e35f810a",
+        "android_client_info": {
+          "package_name": "com.example.diametics"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNLgVr3BvkBqXPOeb78LH5IQ16yQb2tus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

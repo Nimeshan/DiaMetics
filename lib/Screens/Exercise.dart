@@ -1,6 +1,7 @@
 import 'package:diametics/Screens/Running.dart';
 import 'package:diametics/Screens/WeightLifiting.dart';
 import 'package:flutter/material.dart';
+import 'package:diametics/Screens/HospitalLocator.dart';
 import 'YogaScreen.dart';
 import 'HamburgerMenu.dart';
 
@@ -30,11 +31,12 @@ class Exercises extends StatelessWidget {
           ),
           actions: [
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.lightbulb, size: 20),
-            ),
-            IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HospitalLocator()),
+                );
+              },
               icon: const Icon(Icons.local_hospital, size: 20),
             ),
           ],

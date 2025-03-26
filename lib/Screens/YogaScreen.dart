@@ -1,7 +1,11 @@
-import 'WeightLifiting.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart' as iframe;
+import 'package:youtube_player_flutter/youtube_player_flutter.dart' as flutter;
+import 'WeightLifiting.dart';
 import 'Running.dart';
+import 'HamburgerMenu.dart';
+import 'package:diametics/Screens/HospitalLocator.dart';
 
 class YogaScreen extends StatefulWidget {
   const YogaScreen({super.key});
@@ -11,15 +15,50 @@ class YogaScreen extends StatefulWidget {
 }
 
 class _YogaScreenState extends State<YogaScreen> {
-  final YoutubePlayerController _controller = YoutubePlayerController(
-    initialVideoId: 'XMrZO7hH6sw',
-    flags: const YoutubePlayerFlags(
-      autoPlay: true,
-      mute: false,
-      enableCaption: false,
-      isLive: false,
-    ),
-  );
+  late final dynamic _controller;
+  bool _isPlaying = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (kIsWeb) {
+      _controller = iframe.YoutubePlayerController.fromVideoId(
+        videoId: 'hRwzELaCHDA',
+        params: const iframe.YoutubePlayerParams(
+          mute: false,
+          showControls: true,
+          showFullscreenButton: false,
+        ),
+      );
+    } else {
+      _controller = flutter.YoutubePlayerController(
+        initialVideoId: 'hRwzELaCHDA',
+        flags: const flutter.YoutubePlayerFlags(
+          mute: false,
+          enableCaption: false,
+          isLive: false,
+        ),
+      );
+
+      _controller.addListener(() {
+        if (_controller.value.isReady &&
+            _controller.value.isPlaying != _isPlaying) {
+          setState(() {
+            _isPlaying = _controller.value.isPlaying;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    if (!kIsWeb) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,15 +77,17 @@ class _YogaScreenState extends State<YogaScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.lightbulb, size: 20),
-          ),
-          IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HospitalLocator()),
+              );
+            },
             icon: const Icon(Icons.local_hospital, size: 20),
           ),
         ],
       ),
+      drawer: const HamburgerMenu(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -68,18 +109,24 @@ class _YogaScreenState extends State<YogaScreen> {
                 label: const Text("Back"),
               ),
               const SizedBox(height: 16),
-              YoutubePlayer(
-                controller: _controller,
-                showVideoProgressIndicator: true,
-              ),
+              kIsWeb
+                  ? iframe.YoutubePlayer(controller: _controller)
+                  : flutter.YoutubePlayerBuilder(
+                      player: flutter.YoutubePlayer(controller: _controller),
+                      builder: (context, player) {
+                        return Column(
+                          children: [player],
+                        );
+                      },
+                    ),
               const SizedBox(height: 16),
               const Text(
-                'Yoga for Beginners Video',
+                'Yoga for Diabetic Patients',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Lorem Ipsum ipsum Lorem Lorem Lorem Ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem',
+                'Watch this Video to get help Reduce the Diabetic Level',
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 24),

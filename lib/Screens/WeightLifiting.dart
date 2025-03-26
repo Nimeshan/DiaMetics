@@ -1,6 +1,11 @@
 import 'package:diametics/Screens/YogaScreen.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart' as iframe;
+import 'package:youtube_player_flutter/youtube_player_flutter.dart' as flutter;
+import 'Running.dart';
+import 'HamburgerMenu.dart';
+import 'package:diametics/Screens/HospitalLocator.dart';
 
 class WeightScreen extends StatefulWidget {
   const WeightScreen({super.key});
@@ -10,15 +15,50 @@ class WeightScreen extends StatefulWidget {
 }
 
 class _WeightScreenState extends State<WeightScreen> {
-  final YoutubePlayerController _controller = YoutubePlayerController(
-    initialVideoId: 'XMrZO7hH6sw',
-    flags: const YoutubePlayerFlags(
-      autoPlay: true,
-      mute: false,
-      enableCaption: false,
-      isLive: false,
-    ),
-  );
+  late final dynamic _controller;
+  bool _isPlaying = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (kIsWeb) {
+      _controller = iframe.YoutubePlayerController.fromVideoId(
+        videoId: 'bN-KDZILoJ0',
+        params: const iframe.YoutubePlayerParams(
+          mute: false,
+          showControls: true,
+          showFullscreenButton: false,
+        ),
+      );
+    } else {
+      _controller = flutter.YoutubePlayerController(
+        initialVideoId: 'bN-KDZILoJ0',
+        flags: const flutter.YoutubePlayerFlags(
+          mute: false,
+          enableCaption: false,
+          isLive: false,
+        ),
+      );
+
+      _controller.addListener(() {
+        if (_controller.value.isReady &&
+            _controller.value.isPlaying != _isPlaying) {
+          setState(() {
+            _isPlaying = _controller.value.isPlaying;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    if (!kIsWeb) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,15 +77,17 @@ class _WeightScreenState extends State<WeightScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.lightbulb, size: 20),
-          ),
-          IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HospitalLocator()),
+              );
+            },
             icon: const Icon(Icons.local_hospital, size: 20),
           ),
         ],
       ),
+      drawer: const HamburgerMenu(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -67,18 +109,24 @@ class _WeightScreenState extends State<WeightScreen> {
                 label: const Text("Back"),
               ),
               const SizedBox(height: 16),
-              YoutubePlayer(
-                controller: _controller,
-                showVideoProgressIndicator: true,
-              ),
+              kIsWeb
+                  ? iframe.YoutubePlayer(controller: _controller)
+                  : flutter.YoutubePlayerBuilder(
+                      player: flutter.YoutubePlayer(controller: _controller),
+                      builder: (context, player) {
+                        return Column(
+                          children: [player],
+                        );
+                      },
+                    ),
               const SizedBox(height: 16),
               const Text(
-                'Weight Lifting for Beginners Video',
+                'Weight Lifting for Diabetic Patients',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Lorem Ipsum ipsum Lorem Lorem Lorem Ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem ipsum ipsum Lorem LoremLorem',
+                'Watch this video to Learn Weight Lifting for Diabetic Patients',
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 24),
@@ -91,7 +139,7 @@ class _WeightScreenState extends State<WeightScreen> {
                 width: 300,
                 child: ExerciseCard(
                   title: 'Yoga',
-                  imagePath: 'assets/yoga.png',
+                  imagePath: 'assets/Yoga.png',
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -107,12 +155,12 @@ class _WeightScreenState extends State<WeightScreen> {
                 width: 300,
                 child: ExerciseCard(
                   title: 'Running',
-                  imagePath: 'assets/running.png',
+                  imagePath: 'assets/Running.png',
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => YogaScreen(),
+                        builder: (context) => const RunningScreen(),
                       ),
                     );
                   },

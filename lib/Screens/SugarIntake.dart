@@ -1,302 +1,262 @@
 import 'package:flutter/material.dart';
+import 'package:openfoodfacts/openfoodfacts.dart' as openfood;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'HamburgerMenu.dart';
+import 'Barcode.dart';
+import 'package:diametics/Screens/HospitalLocator.dart';
 
-void main() {
-  runApp(const SugarIntake());
-}
-
-class SugarIntake extends StatelessWidget {
+class SugarIntake extends StatefulWidget {
   const SugarIntake({super.key});
 
   @override
+  State<SugarIntake> createState() => _SugarIntakeState();
+}
+
+class _SugarIntakeState extends State<SugarIntake> {
+  final TextEditingController _searchController = TextEditingController();
+  final List<openfood.Product> _selectedFoods = [];
+  List<openfood.Product> _searchResults = [];
+
+  final auth.User _user = auth.FirebaseAuth.instance.currentUser!;
+
+  @override
+  void initState() {
+    super.initState();
+    openfood.OpenFoodAPIConfiguration.userAgent = openfood.UserAgent(
+      name: 'SugarIntakeApp',
+      version: '1.0',
+    );
+    openfood.OpenFoodAPIConfiguration.globalLanguages = [
+      openfood.OpenFoodFactsLanguage.ENGLISH
+    ];
+    openfood.OpenFoodAPIConfiguration.globalCountry =
+        openfood.OpenFoodFactsCountry.USA;
+
+    _loadSelectedFoods();
+  }
+
+  Future<void> _loadSelectedFoods() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedData = prefs.getString('selected_foods');
+
+    List<dynamic> decodedData = storedData != null && storedData.isNotEmpty
+        ? json.decode(storedData)
+        : [];
+
+    setState(() {
+      _selectedFoods.addAll(
+        decodedData.map((item) => openfood.Product.fromJson(item)).toList(),
+      );
+    });
+  }
+
+  Future<void> _saveSelectedFoods() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jsonData = json.encode(
+      _selectedFoods.map((product) => product.toJson()).toList(),
+    );
+    await prefs.setString('selected_foods', jsonData);
+  }
+
+  String _getSugarContent(openfood.Product product) {
+    double? sugarContent = product.nutriments?.getValue(
+      openfood.Nutrient.sugars,
+      openfood.PerSize.oneHundredGrams,
+    );
+    return sugarContent != null ? '${sugarContent.toStringAsFixed(1)}g' : 'N/A';
+  }
+
+  Future<void> _searchFood(String query) async {
+    if (query.isEmpty) return;
+
+    try {
+      final config = openfood.ProductSearchQueryConfiguration(
+        parametersList: [
+          openfood.SearchTerms(terms: [query]),
+        ],
+        language: openfood.OpenFoodFactsLanguage.ENGLISH,
+        country: openfood.OpenFoodFactsCountry.USA,
+        fields: [
+          openfood.ProductField.NAME,
+          openfood.ProductField.IMAGE_FRONT_URL,
+          openfood.ProductField.NUTRIMENTS,
+        ],
+        version: openfood.ProductQueryVersion.v3,
+      );
+
+      final result = await openfood.OpenFoodAPIClient.searchProducts(
+        null,
+        config,
+      );
+
+      if (result.products != null && result.products!.isNotEmpty) {
+        setState(() {
+          _searchResults = result.products!;
+        });
+      } else {
+        debugPrint("No products found.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No products found.")),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error fetching data: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching data: $e")),
+      );
+    }
+  }
+
+  void _addFood(openfood.Product product) async {
+    setState(() {
+      _selectedFoods.add(product);
+      _searchResults.clear();
+      _searchController.clear();
+    });
+
+    await _saveSelectedFoods();
+    await _storeFoodInFirebase(product);
+  }
+
+  Future<void> _storeFoodInFirebase(openfood.Product product) async {
+    try {
+      String foodName = product.productName ?? "Unknown Food";
+      double sugarContent = product.nutriments?.getValue(
+              openfood.Nutrient.sugars, openfood.PerSize.oneHundredGrams) ??
+          0;
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user.uid)
+          .collection('sugarIntake')
+          .add({
+        'foodName': foodName,
+        'sugarContent': sugarContent,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      print("Food added to Firebase successfully.");
+    } catch (e) {
+      print("Error storing food in Firebase: $e");
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFF2893E),
-          leading: Builder(
-            builder: (context) {
-              return IconButton(
-                icon: const Icon(Icons.menu, size: 20),
-                onPressed: () {
-                  Scaffold.of(context).openDrawer(); // Open the drawer
-                },
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF2893E),
+        leading: Builder(builder: (context) {
+          return IconButton(
+            icon: const Icon(Icons.menu, size: 20),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          );
+        }),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HospitalLocator()),
               );
             },
+            icon: const Icon(Icons.local_hospital, size: 20),
           ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.lightbulb, size: 20),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.local_hospital, size: 20),
-            ),
-          ],
-        ),
-        drawer: const HamburgerMenu(),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        ],
+      ),
+      drawer: const HamburgerMenu(),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
             const Text(
               "Add Sugar Intake",
               style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
             ),
-            const Padding(
-              padding: EdgeInsets.all(20),
+            Padding(
+              padding: const EdgeInsets.all(20),
               child: TextField(
+                controller: _searchController,
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
-                  hintText: 'Search',
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {},
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 20.0, top: 3.0, right: 2.0, bottom: 1.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Scan Bar Code Instead',
-                    style: TextStyle(
-                      color: Colors.black,
-                    ),
+                  prefixIcon: const Icon(Icons.search),
+                  border: const OutlineInputBorder(),
+                  hintText: 'Search for food...',
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() => _searchResults.clear());
+                    },
                   ),
                 ),
+                onSubmitted: _searchFood,
               ),
             ),
-            const SizedBox(height: 18),
-            Card(
-              color: Color(0xFFFBECEC), // Background color for the card
-              elevation: 4, // Adds shadow to the card
-              margin: EdgeInsets.symmetric(
-                  horizontal: 16), // Adds horizontal padding
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+            ElevatedButton(
+              onPressed: () async {
+                final scannedProduct = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Barcode()),
+                );
+
+                if (scannedProduct != null) {
+                  _addFood(scannedProduct);
+                }
+              },
+              child: const Text("Scan Barcode"),
+            ),
+            if (_searchResults.isNotEmpty)
+              Column(
+                children: _searchResults.map((product) {
+                  return ListTile(
+                    leading: product.imageFrontUrl != null
+                        ? Image.network(product.imageFrontUrl!,
+                            width: 50, height: 50, fit: BoxFit.cover)
+                        : const Icon(Icons.fastfood, size: 50),
+                    title: Text(product.productName ?? "Unknown Food"),
+                    subtitle: Text("Sugar: ${_getSugarContent(product)}"),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.add, color: Colors.green),
+                      onPressed: () => _addFood(product),
+                    ),
+                  );
+                }).toList(),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16), // Adds inner padding
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                          8), // Rounded corners for the image
-                      child: Image.asset(
-                        "assets/food.jpg", // Replace with your image path
-                        width: 50, // Image width
-                        height: 50, // Image height
-                        fit: BoxFit.cover, // Ensures the image fits nicely
+            const SizedBox(height: 20),
+            if (_selectedFoods.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "What you have eaten:",
+                    style:
+                        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  ..._selectedFoods.map((product) {
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ListTile(
+                        leading: product.imageFrontUrl != null
+                            ? Image.network(
+                                product.imageFrontUrl!,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              )
+                            : const Icon(Icons.fastfood, size: 50),
+                        title: Text(product.productName ?? "Unknown Food"),
+                        subtitle: Text("Sugar: ${_getSugarContent(product)}"),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Food Name",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "25g sugar",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                    );
+                  }),
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              "You have Eaten",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Card(
-              color: Color(0xFFFBECEC), // Background color for the card
-              elevation: 4, // Adds shadow to the card
-              margin: EdgeInsets.symmetric(
-                  horizontal: 16), // Adds horizontal padding
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16), // Adds inner padding
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                          8), // Rounded corners for the image
-                      child: Image.asset(
-                        "assets/food.jpg", // Replace with your image path
-                        width: 50, // Image width
-                        height: 50, // Image height
-                        fit: BoxFit.cover, // Ensures the image fits nicely
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Food Name",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "25g sugar",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Card(
-              color: Color(0xFFFBECEC), // Background color for the card
-              elevation: 4, // Adds shadow to the card
-              margin: EdgeInsets.symmetric(
-                  horizontal: 16), // Adds horizontal padding
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16), // Adds inner padding
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                          8), // Rounded corners for the image
-                      child: Image.asset(
-                        "assets/food.jpg", // Replace with your image path
-                        width: 50, // Image width
-                        height: 50, // Image height
-                        fit: BoxFit.cover, // Ensures the image fits nicely
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Food Name",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "25g sugar",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Card(
-              color: Color(0xFFFBECEC), // Background color for the card
-              elevation: 4, // Adds shadow to the card
-              margin: EdgeInsets.symmetric(
-                  horizontal: 16), // Adds horizontal padding
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16), // Adds inner padding
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                          8), // Rounded corners for the image
-                      child: Image.asset(
-                        "assets/food.jpg", // Replace with your image path
-                        width: 50, // Image width
-                        height: 50, // Image height
-                        fit: BoxFit.cover, // Ensures the image fits nicely
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Food Name",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "25g sugar",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Card(
-              color: Color(0xFFFBECEC), // Background color for the card
-              elevation: 4, // Adds shadow to the card
-              margin: EdgeInsets.symmetric(
-                  horizontal: 16), // Adds horizontal padding
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16), // Adds inner padding
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                          8), // Rounded corners for the image
-                      child: Image.asset(
-                        "assets/food.jpg", // Replace with your image path
-                        width: 50, // Image width
-                        height: 50, // Image height
-                        fit: BoxFit.cover, // Ensures the image fits nicely
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Food Name",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "25g sugar",
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ]),
+          ],
         ),
       ),
     );

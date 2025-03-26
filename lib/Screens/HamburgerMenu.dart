@@ -2,31 +2,37 @@ import 'package:diametics/Screens/DiabeticLevel.dart';
 import 'package:diametics/Screens/SugarIntake.dart';
 import 'package:diametics/Screens/HomePage.dart';
 import 'package:diametics/Screens/Exercise.dart';
+import 'package:diametics/Screens/Recipes.dart';
+import 'package:diametics/Screens/Account.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HamburgerMenu extends StatelessWidget {
   const HamburgerMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          // Drawer Header
           Container(
             color: const Color(0xFFD4E157),
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 40,
-                  backgroundImage: AssetImage("assets/profile.png"),
+                  backgroundImage: user?.photoURL != null
+                      ? NetworkImage(user!.photoURL!)
+                      : const AssetImage("assets/profile.png") as ImageProvider,
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Jeffery Daniel',
-                  style: TextStyle(
+                Text(
+                  user?.displayName ?? 'Guest User',
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -35,7 +41,6 @@ class HamburgerMenu extends StatelessWidget {
               ],
             ),
           ),
-          // Menu Items
           ListTile(
             leading: const Icon(Icons.home),
             title: const Text('Home'),
@@ -73,12 +78,18 @@ class HamburgerMenu extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.restaurant_menu),
             title: const Text('Recipes'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Recipes()));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.account_circle),
             title: const Text('Account'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Account()));
+            },
           ),
         ],
       ),
