@@ -39,6 +39,7 @@ class FirstRecipe extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Back button along with its routing function to the previous Screen
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
@@ -54,6 +55,7 @@ class FirstRecipe extends StatelessWidget {
                 label: const Text("Back"),
               ),
               const SizedBox(height: 16),
+              // Picture used in the Recipe
               Center(
                 child: Image.asset(
                   'assets/RecipePic.png',
@@ -62,11 +64,13 @@ class FirstRecipe extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
+              // Heading for the Recipe
               const SizedBox(height: 16),
               const Text(
                 'Diabetic Friendly Pizza',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
+              // Recipe Content
               const SizedBox(height: 8),
               const Text(
                 "Diabetic-Friendly Pizza Recipe: Create a delicious, diabetes-conscious pizza by starting with a low-carb crust like cauliflower or whole grain.",

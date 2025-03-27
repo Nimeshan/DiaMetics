@@ -23,6 +23,7 @@ class HamburgerMenu extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
+                // User Profile Image
                 CircleAvatar(
                   radius: 40,
                   backgroundImage: user?.photoURL != null
@@ -30,6 +31,7 @@ class HamburgerMenu extends StatelessWidget {
                       : const AssetImage("assets/profile.png") as ImageProvider,
                 ),
                 const SizedBox(height: 10),
+                // User Name if the user is not logged in it ouputs Guest User
                 Text(
                   user?.displayName ?? 'Guest User',
                   style: const TextStyle(
@@ -41,6 +43,7 @@ class HamburgerMenu extends StatelessWidget {
               ],
             ),
           ),
+          // Items of the Hamburger Menu such as the Routing to Home Page, Sugar Intake Page, etc.
           ListTile(
             leading: const Icon(Icons.home),
             title: const Text('Home'),

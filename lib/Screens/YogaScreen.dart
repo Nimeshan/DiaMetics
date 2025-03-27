@@ -14,6 +14,7 @@ class YogaScreen extends StatefulWidget {
   State<YogaScreen> createState() => _YogaScreenState();
 }
 
+// Controller for the Youtube Video Player
 class _YogaScreenState extends State<YogaScreen> {
   late final dynamic _controller;
   bool _isPlaying = true;
@@ -22,7 +23,9 @@ class _YogaScreenState extends State<YogaScreen> {
   void initState() {
     super.initState();
 
+// Initializes Youtube Video Player for both Mobile and Web
     if (kIsWeb) {
+      // Player for Web
       _controller = iframe.YoutubePlayerController.fromVideoId(
         videoId: 'hRwzELaCHDA',
         params: const iframe.YoutubePlayerParams(
@@ -32,6 +35,7 @@ class _YogaScreenState extends State<YogaScreen> {
         ),
       );
     } else {
+      // Player for Mobile
       _controller = flutter.YoutubePlayerController(
         initialVideoId: 'hRwzELaCHDA',
         flags: const flutter.YoutubePlayerFlags(
@@ -41,6 +45,7 @@ class _YogaScreenState extends State<YogaScreen> {
         ),
       );
 
+      // Listens for player state changes
       _controller.addListener(() {
         if (_controller.value.isReady &&
             _controller.value.isPlaying != _isPlaying) {
@@ -52,6 +57,7 @@ class _YogaScreenState extends State<YogaScreen> {
     }
   }
 
+// Cleans up the Controller when the Widget is disposed
   @override
   void dispose() {
     if (!kIsWeb) {
@@ -94,6 +100,7 @@ class _YogaScreenState extends State<YogaScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Back Button
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
@@ -110,6 +117,7 @@ class _YogaScreenState extends State<YogaScreen> {
               ),
               const SizedBox(height: 16),
               kIsWeb
+                  // Youtube Video Player
                   ? iframe.YoutubePlayer(controller: _controller)
                   : flutter.YoutubePlayerBuilder(
                       player: flutter.YoutubePlayer(controller: _controller),
@@ -119,6 +127,7 @@ class _YogaScreenState extends State<YogaScreen> {
                         );
                       },
                     ),
+              // Video Title and Description
               const SizedBox(height: 16),
               const Text(
                 'Yoga for Diabetic Patients',
@@ -151,6 +160,7 @@ class _YogaScreenState extends State<YogaScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+              // Suggestion Cards Motivating the Users to check other Excerises as well
               SizedBox(
                 width: 300,
                 child: ExerciseCard(
@@ -174,6 +184,7 @@ class _YogaScreenState extends State<YogaScreen> {
   }
 }
 
+// Code for Resusability of the Exercise Cards
 class ExerciseCard extends StatelessWidget {
   final String title;
   final String imagePath;
@@ -186,6 +197,7 @@ class ExerciseCard extends StatelessWidget {
     required this.onPressed,
   });
 
+// Section for the Customisation of them
   @override
   Widget build(BuildContext context) {
     return InkWell(

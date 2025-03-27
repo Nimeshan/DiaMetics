@@ -22,7 +22,9 @@ class _RunningScreenState extends State<RunningScreen> {
   void initState() {
     super.initState();
 
+    // Initializes the Youtube Video Required to be Played
     if (kIsWeb) {
+      // Web player configuration
       _controller = iframe.YoutubePlayerController.fromVideoId(
         videoId: 'ofJKhxcLNAs',
         params: const iframe.YoutubePlayerParams(
@@ -32,6 +34,7 @@ class _RunningScreenState extends State<RunningScreen> {
         ),
       );
     } else {
+      // Mobile player configuration
       _controller = flutter.YoutubePlayerController(
         initialVideoId: 'ofJKhxcLNAs',
         flags: const flutter.YoutubePlayerFlags(
@@ -41,6 +44,7 @@ class _RunningScreenState extends State<RunningScreen> {
         ),
       );
 
+      // Listen for player state changes
       _controller.addListener(() {
         if (_controller.value.isReady &&
             _controller.value.isPlaying != _isPlaying) {
@@ -52,6 +56,7 @@ class _RunningScreenState extends State<RunningScreen> {
     }
   }
 
+// Cleans up the controller when the widget is disposed
   @override
   void dispose() {
     if (!kIsWeb) {
@@ -94,6 +99,7 @@ class _RunningScreenState extends State<RunningScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Back Button
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
@@ -109,6 +115,7 @@ class _RunningScreenState extends State<RunningScreen> {
                 label: const Text("Back"),
               ),
               const SizedBox(height: 16),
+              // Youtube Video Player
               kIsWeb
                   ? iframe.YoutubePlayer(controller: _controller)
                   : flutter.YoutubePlayerBuilder(
@@ -120,6 +127,7 @@ class _RunningScreenState extends State<RunningScreen> {
                       },
                     ),
               const SizedBox(height: 16),
+              // Video Title and Description
               const Text(
                 'Running with Diabetics',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -130,6 +138,7 @@ class _RunningScreenState extends State<RunningScreen> {
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 24),
+              // Suggestion Cards Motivating the Users to check other Excerises as well
               const Text(
                 'Try these',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -139,7 +148,7 @@ class _RunningScreenState extends State<RunningScreen> {
                 width: 300,
                 child: ExerciseCard(
                   title: 'Yoga',
-                  imagePath: 'assets/Yoga.png',
+                  imagePath: 'assets/yoga.png',
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -174,6 +183,7 @@ class _RunningScreenState extends State<RunningScreen> {
   }
 }
 
+// Code for Resusability of the Exercise Cards
 class ExerciseCard extends StatelessWidget {
   final String title;
   final String imagePath;
@@ -186,6 +196,7 @@ class ExerciseCard extends StatelessWidget {
     required this.onPressed,
   });
 
+// Section for the Customisation of them
   @override
   Widget build(BuildContext context) {
     return InkWell(

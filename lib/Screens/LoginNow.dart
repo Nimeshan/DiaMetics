@@ -11,6 +11,7 @@ class LoginNow extends StatefulWidget {
   _LoginNowState createState() => _LoginNowState();
 }
 
+// Controllers used for Email, and Password Input as well as Firebase Authentication instance.
 class _LoginNowState extends State<LoginNow> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -26,6 +27,7 @@ class _LoginNowState extends State<LoginNow> {
     await prefs.setBool('is_logged_in', true);
   }
 
+  // Handles login with email and password
   Future<void> _login() async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -43,12 +45,14 @@ class _LoginNowState extends State<LoginNow> {
         );
       }
     } catch (e) {
+      // Error message if login fails
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: $e')),
       );
     }
   }
 
+// Section for Input Fields
   @override
   Widget build(BuildContext context) {
     return Scaffold(

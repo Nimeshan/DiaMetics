@@ -9,9 +9,12 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
+  // Controller for email input field
   final TextEditingController _emailController = TextEditingController();
+  // Creates an instance of Firebase
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // Function used for handling Reset password and handles email validation
   Future<void> _resetPassword() async {
     if (_emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -20,6 +23,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       return;
     }
 
+    // Sends password reset email and shows Success and Fail message accordingly.
     try {
       await _auth.sendPasswordResetEmail(email: _emailController.text.trim());
 
@@ -56,6 +60,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ),
               ),
               const SizedBox(height: 20),
+              // Email input field
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -69,6 +74,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 ),
               ),
               const SizedBox(height: 20),
+              // Reset password button
               ElevatedButton(
                 onPressed: _resetPassword,
                 style: ElevatedButton.styleFrom(

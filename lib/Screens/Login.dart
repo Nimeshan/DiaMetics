@@ -8,6 +8,7 @@ import 'HomePage.dart';
 import 'RegisterNow.dart';
 import 'LoginNow.dart';
 
+// Initializes Flutter and Firebase before app starts
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -20,6 +21,7 @@ void main() async {
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
+// API Key for Google OAuth (from Firebase console)
   static const String webClientId =
       "862563017151-7opqssqg8q043h8taagcob1gmoo7f833.apps.googleusercontent.com";
 
@@ -76,6 +78,7 @@ class LoginPage extends StatelessWidget {
     }
   }
 
+// Code for the App Logo, Name, and the buttons such as Sign in with Google, Register new User, etc.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

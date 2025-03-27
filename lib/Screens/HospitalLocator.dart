@@ -5,6 +5,7 @@ import 'HamburgerMenu.dart';
 class HospitalLocator extends StatelessWidget {
   const HospitalLocator({super.key});
 
+// Function to set up the Call Feature to call NHS
   void _callEmergency(BuildContext context) async {
     final Uri callUri = Uri.parse("tel:999");
     if (await canLaunchUrl(callUri)) {
@@ -21,7 +22,8 @@ class HospitalLocator extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFF2893E),
-        title: const Text("Hospital Locator", style: TextStyle(color: Colors.white)),
+        title: const Text("Hospital Locator",
+            style: TextStyle(color: Colors.white)),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu, color: Colors.black),
@@ -34,7 +36,8 @@ class HospitalLocator extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const HospitalLocator()),
+                MaterialPageRoute(
+                    builder: (context) => const HospitalLocator()),
               );
             },
           ),
@@ -46,6 +49,7 @@ class HospitalLocator extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Displays Details for the Call to Action
             const Text(
               "Diabetic Emergency",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -57,15 +61,20 @@ class HospitalLocator extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Center(
+              // Button to make Calls to the NHS
               child: ElevatedButton(
                 onPressed: () => _callEmergency(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFC4C44C),
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
                 ),
                 child: const Text(
                   "Call NHS 999",
-                  style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ),

@@ -15,6 +15,7 @@ class SugarIntake extends StatefulWidget {
   State<SugarIntake> createState() => _SugarIntakeState();
 }
 
+// Controller for Search Input and the Lists for User's selected food items and the Food Search Result
 class _SugarIntakeState extends State<SugarIntake> {
   final TextEditingController _searchController = TextEditingController();
   final List<openfood.Product> _selectedFoods = [];
@@ -22,6 +23,7 @@ class _SugarIntakeState extends State<SugarIntake> {
 
   final auth.User _user = auth.FirebaseAuth.instance.currentUser!;
 
+// Configuration of the Open Food Facts API
   @override
   void initState() {
     super.initState();
@@ -38,6 +40,7 @@ class _SugarIntakeState extends State<SugarIntake> {
     _loadSelectedFoods();
   }
 
+  // Load selected foods from local storage
   Future<void> _loadSelectedFoods() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedData = prefs.getString('selected_foods');
@@ -53,6 +56,7 @@ class _SugarIntakeState extends State<SugarIntake> {
     });
   }
 
+// Save selected foods to local storage
   Future<void> _saveSelectedFoods() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String jsonData = json.encode(
@@ -61,6 +65,7 @@ class _SugarIntakeState extends State<SugarIntake> {
     await prefs.setString('selected_foods', jsonData);
   }
 
+// Extract sugar content from product data
   String _getSugarContent(openfood.Product product) {
     double? sugarContent = product.nutriments?.getValue(
       openfood.Nutrient.sugars,
@@ -69,6 +74,7 @@ class _SugarIntakeState extends State<SugarIntake> {
     return sugarContent != null ? '${sugarContent.toStringAsFixed(1)}g' : 'N/A';
   }
 
+// Search for food in OpenFoodFacts database
   Future<void> _searchFood(String query) async {
     if (query.isEmpty) return;
 
@@ -110,6 +116,7 @@ class _SugarIntakeState extends State<SugarIntake> {
     }
   }
 
+// Add food to selected list and saves both on Firebase and local storage
   void _addFood(openfood.Product product) async {
     setState(() {
       _selectedFoods.add(product);
@@ -121,6 +128,7 @@ class _SugarIntakeState extends State<SugarIntake> {
     await _storeFoodInFirebase(product);
   }
 
+// Store food in Firebase
   Future<void> _storeFoodInFirebase(openfood.Product product) async {
     try {
       String foodName = product.productName ?? "Unknown Food";
@@ -178,6 +186,7 @@ class _SugarIntakeState extends State<SugarIntake> {
               style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
             ),
             Padding(
+              // Search Field used to Search Food
               padding: const EdgeInsets.all(20),
               child: TextField(
                 controller: _searchController,
@@ -196,6 +205,7 @@ class _SugarIntakeState extends State<SugarIntake> {
                 onSubmitted: _searchFood,
               ),
             ),
+            // Scan Barcode Button
             ElevatedButton(
               onPressed: () async {
                 final scannedProduct = await Navigator.push(
@@ -209,6 +219,7 @@ class _SugarIntakeState extends State<SugarIntake> {
               },
               child: const Text("Scan Barcode"),
             ),
+            // Search results from the Above Search
             if (_searchResults.isNotEmpty)
               Column(
                 children: _searchResults.map((product) {
@@ -226,6 +237,7 @@ class _SugarIntakeState extends State<SugarIntake> {
                   );
                 }).toList(),
               ),
+            // Section to show the Food You have eaten
             const SizedBox(height: 20),
             if (_selectedFoods.isNotEmpty)
               Column(

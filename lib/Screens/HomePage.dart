@@ -15,11 +15,13 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+// Variable and Lists that Store Diabetic Level, History Data and stores food product details
 class _HomePageState extends State<HomePage> {
   int diabeticLevel = 0;
   List<int> sugarLevels = [];
   List<openfood.Product> _selectedFoods = [];
 
+// Loads saved diabetic, sugar levels, and saved food items
   @override
   void initState() {
     super.initState();
@@ -28,6 +30,7 @@ class _HomePageState extends State<HomePage> {
     _loadSelectedFoods();
   }
 
+// Load diabetic level from local storage
   Future<void> _loadDiabeticLevel() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -35,6 +38,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+// Load sugar levels from local storage
   Future<void> _loadSugarLevels() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedData = prefs.getString('sugar_levels');
@@ -45,6 +49,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+// Load selected foods from local storage
   Future<void> _loadSelectedFoods() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedData = prefs.getString('selected_foods');
@@ -57,6 +62,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+// Categorize risk level based on sugar reading
   String getRiskLevel(int level) {
     if (level < 70) {
       return "Low";
@@ -69,6 +75,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+// Get color based on risk level
   Color getRiskColor(int level) {
     if (level < 70) {
       return Colors.blue;
@@ -81,6 +88,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+// Extract sugar content from product data
   String _getSugarContent(openfood.Product product) {
     double? sugarContent = product.nutriments?.getValue(
       openfood.Nutrient.sugars,
@@ -91,6 +99,7 @@ class _HomePageState extends State<HomePage> {
         : 'N/A';
   }
 
+// Generate pie chart data from sugar levels
   List<PieChartSectionData> _getPieChartData() {
     final List<Color> colors = [
       Colors.blue,
@@ -131,6 +140,7 @@ class _HomePageState extends State<HomePage> {
             );
           },
         ),
+        // Refresh button to referesh the Piechart ajnd the food list.
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -158,6 +168,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
+            // Sugar level chart section
             AspectRatio(
               aspectRatio: 1.38,
               child: sugarLevels.isEmpty
@@ -244,6 +255,7 @@ class _HomePageState extends State<HomePage> {
                     ),
             ),
             const SizedBox(height: 16),
+            // You have eaten and Food Card Section
             const Text(
               "You have Eaten",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -291,6 +303,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               )
+            // Display last 3 foods (most recent first)
             else
               ..._selectedFoods.reversed.take(3).map((product) {
                 return Padding(
@@ -308,6 +321,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+// Helper widget for food cards
   Widget _buildFoodCard(
       String foodName, String sugarContent, String? imageUrl) {
     return Card(
@@ -346,6 +360,7 @@ class _HomePageState extends State<HomePage> {
                     ),
             ),
             const SizedBox(width: 16),
+            // Details of the Food such as the Sugar Content
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

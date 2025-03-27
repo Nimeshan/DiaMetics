@@ -8,6 +8,7 @@ import 'package:diametics/Screens/HospitalLocator.dart';
 import 'HamburgerMenu.dart';
 
 void main() async {
+  // Initializes the Flutter and Firebase before the app starts
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const DiabeticLevel());
@@ -20,6 +21,7 @@ class DiabeticLevel extends StatefulWidget {
   _DiabeticLevelState createState() => _DiabeticLevelState();
 }
 
+// Controls Sugar Level Input as well as stores the record of last 14 days
 class _DiabeticLevelState extends State<DiabeticLevel> {
   final TextEditingController _sugarController = TextEditingController();
   List<int> sugarLevels = [];
@@ -30,6 +32,7 @@ class _DiabeticLevelState extends State<DiabeticLevel> {
     _loadSugarLevels();
   }
 
+  // Loads sugar levels from local storage
   Future<void> _loadSugarLevels() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storedData = prefs.getString('sugar_levels');
@@ -40,6 +43,7 @@ class _DiabeticLevelState extends State<DiabeticLevel> {
     });
   }
 
+  // Adds new sugar level and manages storage and ensures only the last 14 records are saved.
   Future<void> _addSugarLevel() async {
     int sugarLevel = int.tryParse(_sugarController.text) ?? 0;
     if (sugarLevel > 0) {
@@ -50,28 +54,36 @@ class _DiabeticLevelState extends State<DiabeticLevel> {
         }
       });
 
+      // Save to local storage
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('sugar_levels', json.encode(sugarLevels));
 
+      // Backup to Firebase
       await _uploadToFirebase();
 
+      // Clear input field
       _sugarController.clear();
     }
   }
 
+  // Uploads data to Firebase Storage
   Future<void> _uploadToFirebase() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
+      // Checks whether the user is logged in or not
       if (user == null) {
         print("User not logged in");
         return;
       }
 
+      // Creates user-specific file path
       String filePath = 'sugar_levels/${user.uid}.json';
       Reference storageRef = FirebaseStorage.instance.ref().child(filePath);
 
+      // Converts data to JSON format
       String jsonData = json.encode(sugarLevels);
 
+      // Upload to the Firebase Storage
       await storageRef.putString(jsonData, format: PutStringFormat.raw);
 
       print("Sugar levels uploaded successfully");
@@ -117,6 +129,7 @@ class _DiabeticLevelState extends State<DiabeticLevel> {
               "Add Sugar Level",
               style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
             ),
+            // Input field to enter the Sugar Level
             Padding(
               padding: const EdgeInsets.all(20),
               child: TextField(
@@ -128,6 +141,7 @@ class _DiabeticLevelState extends State<DiabeticLevel> {
                 ),
               ),
             ),
+            // Button to Add the Level to the List
             ElevatedButton(
               onPressed: _addSugarLevel,
               style: ElevatedButton.styleFrom(
@@ -152,6 +166,7 @@ class _DiabeticLevelState extends State<DiabeticLevel> {
               "Last 14 Days Sugar Levels:",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            // List of the Last 14 Diabetic Level Record
             ListView.builder(
               shrinkWrap: true,
               itemCount: sugarLevels.length,

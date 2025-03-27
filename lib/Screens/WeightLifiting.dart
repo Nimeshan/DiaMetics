@@ -14,6 +14,7 @@ class WeightScreen extends StatefulWidget {
   State<WeightScreen> createState() => _WeightScreenState();
 }
 
+// Controller for the Youtube Video Player
 class _WeightScreenState extends State<WeightScreen> {
   late final dynamic _controller;
   bool _isPlaying = true;
@@ -22,7 +23,9 @@ class _WeightScreenState extends State<WeightScreen> {
   void initState() {
     super.initState();
 
+// Initializes Youtube Video Player for both Mobile and Web
     if (kIsWeb) {
+      // Player for Web
       _controller = iframe.YoutubePlayerController.fromVideoId(
         videoId: 'bN-KDZILoJ0',
         params: const iframe.YoutubePlayerParams(
@@ -32,6 +35,7 @@ class _WeightScreenState extends State<WeightScreen> {
         ),
       );
     } else {
+      // Player for Mobile
       _controller = flutter.YoutubePlayerController(
         initialVideoId: 'bN-KDZILoJ0',
         flags: const flutter.YoutubePlayerFlags(
@@ -41,6 +45,7 @@ class _WeightScreenState extends State<WeightScreen> {
         ),
       );
 
+      // Listens for player state changes
       _controller.addListener(() {
         if (_controller.value.isReady &&
             _controller.value.isPlaying != _isPlaying) {
@@ -52,6 +57,7 @@ class _WeightScreenState extends State<WeightScreen> {
     }
   }
 
+// Cleans up the Controller when the Widget is disposed
   @override
   void dispose() {
     if (!kIsWeb) {
@@ -94,6 +100,7 @@ class _WeightScreenState extends State<WeightScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Back Button
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
@@ -109,6 +116,7 @@ class _WeightScreenState extends State<WeightScreen> {
                 label: const Text("Back"),
               ),
               const SizedBox(height: 16),
+              // Youtube Video Player
               kIsWeb
                   ? iframe.YoutubePlayer(controller: _controller)
                   : flutter.YoutubePlayerBuilder(
@@ -119,6 +127,7 @@ class _WeightScreenState extends State<WeightScreen> {
                         );
                       },
                     ),
+              // Video Title and Description
               const SizedBox(height: 16),
               const Text(
                 'Weight Lifting for Diabetic Patients',
@@ -134,12 +143,13 @@ class _WeightScreenState extends State<WeightScreen> {
                 'Try these',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
+              // Suggestion Cards Motivating the Users to check other Excerises as well
               const SizedBox(height: 16),
               SizedBox(
                 width: 300,
                 child: ExerciseCard(
                   title: 'Yoga',
-                  imagePath: 'assets/Yoga.png',
+                  imagePath: 'assets/yoga.png',
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -155,7 +165,7 @@ class _WeightScreenState extends State<WeightScreen> {
                 width: 300,
                 child: ExerciseCard(
                   title: 'Running',
-                  imagePath: 'assets/Running.png',
+                  imagePath: 'assets/running.png',
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -174,6 +184,7 @@ class _WeightScreenState extends State<WeightScreen> {
   }
 }
 
+// Code for Resusability of the Exercise Cards
 class ExerciseCard extends StatelessWidget {
   final String title;
   final String imagePath;
@@ -186,6 +197,7 @@ class ExerciseCard extends StatelessWidget {
     required this.onPressed,
   });
 
+// Section for the Customisation of them
   @override
   Widget build(BuildContext context) {
     return InkWell(

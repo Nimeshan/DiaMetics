@@ -41,42 +41,47 @@ class Recipes extends StatelessWidget {
           ],
         ),
         drawer: const HamburgerMenu(),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: Text(
-                  "Diabetic Friendly Recipes",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Text(
+                    "Diabetic Friendly Recipes",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 15),
-              FoodCard(
-                title: "Diabetic Friendly Pizza",
-                subtitle: "Recipe 1",
-                imagePath: "assets/RecipePic.png",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const FirstRecipe()),
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
-              FoodCard(
-                title: "Diabetic-Friendly Avocado Egg Salad",
-                subtitle: "Recipe 2",
-                imagePath: "assets/avocado.jpeg",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SecondRecipe()),
-                  );
-                },
-              ),
-            ],
+                const SizedBox(height: 15),
+                // Following Section has the Recipe Cards
+                FoodCard(
+                  title: "Diabetic Friendly Pizza",
+                  subtitle: "Recipe 1",
+                  imagePath: "assets/RecipePic.png",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const FirstRecipe()),
+                    );
+                  },
+                ),
+                const SizedBox(height: 8),
+                FoodCard(
+                  title: "Diabetic-Friendly Avocado Egg Salad",
+                  subtitle: "Recipe 2",
+                  imagePath: "assets/avocado.jpeg",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SecondRecipe()),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -84,6 +89,7 @@ class Recipes extends StatelessWidget {
   }
 }
 
+// Set up for Reusable Recipe Cards
 class FoodCard extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -98,6 +104,7 @@ class FoodCard extends StatelessWidget {
     required this.onTap,
   });
 
+// Styling for Recipe Cards such as Colors, and Radius used for it
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -123,20 +130,24 @@ class FoodCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

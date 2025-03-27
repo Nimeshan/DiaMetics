@@ -39,6 +39,7 @@ class SecondRecipe extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Back button
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
@@ -54,6 +55,7 @@ class SecondRecipe extends StatelessWidget {
                 label: const Text("Back"),
               ),
               const SizedBox(height: 16),
+              // Recipe image and other Information of it such as Title
               Center(
                 child: Image.asset(
                   'assets/avocado.jpeg',

@@ -10,6 +10,7 @@ class RegisterNow extends StatefulWidget {
   _RegisterNowState createState() => _RegisterNowState();
 }
 
+// Section that Contains Controller for Input Fields, and Firebase Authentication Instance
 class _RegisterNowState extends State<RegisterNow> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -26,6 +27,7 @@ class _RegisterNowState extends State<RegisterNow> {
     await prefs.setBool('is_logged_in', true);
   }
 
+// Handles user registration
   Future<void> _register() async {
     try {
       UserCredential userCredential =
@@ -88,6 +90,7 @@ class _RegisterNowState extends State<RegisterNow> {
                 ),
               ),
               const SizedBox(height: 10),
+              // This section contains the Input Field for Email, Password and the Button to submit it.
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,

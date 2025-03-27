@@ -12,12 +12,14 @@ class Barcode extends StatefulWidget {
 }
 
 class _BarcodeState extends State<Barcode> {
+  //Camera Controller for Mobile Scanner, as well as the loading state of it and stores the scanned product data
   mobile_scanner.MobileScannerController cameraController =
       mobile_scanner.MobileScannerController();
   bool _isLoading = false;
   openfood.ProductResultV3? _scannedProduct;
 
   @override
+  // Configuration for OpenFoodFacts API settings
   void initState() {
     super.initState();
     openfood.OpenFoodAPIConfiguration.userAgent = openfood.UserAgent(
@@ -31,6 +33,7 @@ class _BarcodeState extends State<Barcode> {
         openfood.OpenFoodFactsCountry.USA;
   }
 
+  // Fetches product details using the scanned barcode
   Future<void> _fetchProductByBarcode(String barcode) async {
     setState(() {
       _isLoading = true;
@@ -71,6 +74,7 @@ class _BarcodeState extends State<Barcode> {
     }
   }
 
+  // Adds the scanned product to sugar intake and returns to previous screen
   void _addScannedProductToSugarIntake(BuildContext context) {
     if (_scannedProduct != null) {
       Navigator.pop(context, _scannedProduct);
@@ -116,6 +120,7 @@ class _BarcodeState extends State<Barcode> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
+              // Back Button
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
@@ -130,6 +135,7 @@ class _BarcodeState extends State<Barcode> {
                 icon: const Icon(Icons.arrow_back),
                 label: const Text("Back"),
               ),
+              // Barcode scanner widget
               const SizedBox(height: 20),
               SizedBox(
                 height: 300,
@@ -145,6 +151,7 @@ class _BarcodeState extends State<Barcode> {
                   },
                 ),
               ),
+              // Show loading indicator or product info
               const SizedBox(height: 20),
               if (_isLoading)
                 const CircularProgressIndicator()
@@ -166,6 +173,7 @@ class _BarcodeState extends State<Barcode> {
                       subtitle:
                           Text("Sugar: ${_getSugarContent(_scannedProduct!)}"),
                     ),
+                    // Button to add product to sugar intake
                     ElevatedButton(
                       onPressed: () => _addScannedProductToSugarIntake(context),
                       child: const Text("Add to Sugar Intake"),

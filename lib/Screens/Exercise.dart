@@ -47,6 +47,7 @@ class Exercises extends StatelessWidget {
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              // Cdde for the Cards such as the One for the Yoga Screen
               children: [
                 SizedBox(
                   width: 300,
@@ -104,6 +105,7 @@ class Exercises extends StatelessWidget {
   }
 }
 
+// Reusable exercise card widget
 class ExerciseCard extends StatelessWidget {
   final String title;
   final String imagePath;
@@ -116,6 +118,7 @@ class ExerciseCard extends StatelessWidget {
     required this.onPressed,
   });
 
+// Code for Styling the Cards such as by using Radius for the Card.
   @override
   Widget build(BuildContext context) {
     return InkWell(

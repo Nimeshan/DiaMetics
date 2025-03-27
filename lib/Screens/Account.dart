@@ -9,9 +9,11 @@ class Account extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Gets the Currently Logged in User with the help of Firebase
     User? user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
+      // AppBar with menu button and hospital locator icon
       appBar: AppBar(
         backgroundColor: const Color(0xFFF2893E),
         leading: Builder(
@@ -19,11 +21,13 @@ class Account extends StatelessWidget {
             return IconButton(
               icon: const Icon(Icons.menu, size: 20),
               onPressed: () {
+                // Opens the drawer when pressed
                 Scaffold.of(context).openDrawer();
               },
             );
           },
         ),
+        // Navigates to HospitalLocator screen When the Icon is pressed
         actions: [
           IconButton(
             onPressed: () {
@@ -44,6 +48,8 @@ class Account extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // User profile picture (CircleAvatar)
+              // Shows the Image of the Google Account as a profile picture else shows a default picture
               CircleAvatar(
                 radius: 67,
                 backgroundImage: user?.photoURL != null
@@ -51,6 +57,7 @@ class Account extends StatelessWidget {
                     : const AssetImage("assets/profile.png") as ImageProvider,
               ),
               const SizedBox(height: 10),
+              // Shows user's display name (or "Guest User" if not logged in)
               Text(
                 user?.displayName ?? 'Guest User',
                 style: const TextStyle(
@@ -67,6 +74,7 @@ class Account extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 15),
+              // Logout Button and the Functions of it
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
